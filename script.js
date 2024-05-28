@@ -1,75 +1,63 @@
 const canvas = document.querySelector("canvas");
-const ctx = canvas.getContext("2d");
-const button = document.querySelector("button");
+const ctx = canvas.getContext('2d');
+
+let sunflowers = [];
+let peashooters = [];
+let zombies = [];
 
 function random(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random()*(max-min+1))+min;
+  return Math.round(Math.random() * (max - min) + min);
 }
 
-let schaarArray;
-let steenArray;
-let papierArray;
-let aantal = 30;
-let stoppen;
-initialize();
-
-
-button.addEventListener("click", initialize);
-
-function initialize() {
-    schaarArray = [];
-    steenArray = [];
-    papierArray = [];
-    for(let i = 0;i<30;i++) {
-        schaarArray.push(new Schaar(random(50, canvas.clientWidth - 50), random(50, canvas.clientHeight - 50), random(1,4)));
-        steenArray.push(new Steen(random(50, canvas.clientWidth - 50), random(50, canvas.clientHeight - 50), random(1,4)));
-        papierArray.push(new Papier(random(50, canvas.clientWidth - 50), random(50, canvas.clientHeight - 50), random(1,4)));
-    }
-    stoppen = false;
-    button.classList.add("hidden");
-    loop();
+canvas.addEventListener('click', placePeashooter, true);
+canvas.addEventListener('contextmenu', placeSunflower, true);
+function placePeashooter(e) {
+  let x = e.pageX-50;
+  let y = e.pageY-50;
+  console.log(`${x}, ${y}`)
+  peashooters.push(new peashooter(x, y));
 }
+function placeSunflower(e) {
+  let x = e.pageX-50;
+  let y = e.pageY-50;
+  e.preventDefault();
+  sunflowers.push(new sunflower(x, y));
+}
+
+function drawPlants() {
+  for (let i = 0; i < peashooters.length; i++) {
+    peashooters[i].draw(ctx)
+  }
+  for (let i = 0; i < sunflowers.length; i++) {
+    sunflowers[i].draw(ctx)
+  }
+}
+let teller = 0;
 function loop() {
-    ctx.clearRect(0,0,1500,700);
-    console.log(steenArray.length + " " + schaarArray.length + " " + papierArray.length);
-    if(steenArray.length == (aantal*3) || papierArray.length == (aantal*3) || schaarArray.length == (aantal*3)) {
-        stoppen = true;
-        button.classList.remove("hidden");
+  ctx.clearRect(0,0,1500, 700);
+  drawPlants();
+  peashooters.forEach((e) => {
+    //if (Object.is(e, peashooter))
+      e.shoot(canvas, ctx);
+  })
+  if (teller % 1000 == 0) {
+    zombies.push(new zombie(canvas.clientWidth, random(50, canvas.clientHeight-200)));
+    teller = 0;
+  }
+  zombies.forEach(element => {
+    element.draw(ctx);
+    element.move(canvas);
+    peashooters.forEach(e => {
+      e.pea.collide(element);
+    });
+  });
+  for (let i = 0; i < zombies.length; i++) {
+    if (zombies[i].hp <= 0) {
+      zombies.splice(i, 1);
     }
-    schaarArray.forEach((el) => {
-        el.move(canvas);
-        el.draw(ctx);
-        for(let i = 0;i<papierArray.length;i++) {
-            if(el.collide(papierArray[i])) {
-                schaarArray.push(new Schaar(papierArray[i].x, papierArray[i].y, random(1,4)));
-                papierArray.splice(i, 1);
-            }
-        }
-    })
-    steenArray.forEach((el) => {
-        el.move(canvas);
-        el.draw(ctx);
-        for(let i = 0;i<schaarArray.length;i++) {
-            if(el.collide(schaarArray[i])) {
-                steenArray.push(new Steen(schaarArray[i].x, schaarArray[i].y, random(1,4)));
-                schaarArray.splice(i, 1);
-            }
-        }
-    })
-    papierArray.forEach((el) => {
-        el.move(canvas);
-        el.draw(ctx);
-        for(let i = 0;i<steenArray.length;i++) {
-            if(el.collide(steenArray[i])) {
-                papierArray.push(new Papier(steenArray[i].x, steenArray[i].y, random(1,4)));
-                steenArray.splice(i, 1);
-            }
-        }
-    })
-    
-    if(stoppen == false) {
-        setTimeout(loop, 10);
-    }
+  }
+  console.log(zombies.length)
+  teller++;
+  setTimeout(loop, 1)
 }
+loop();
