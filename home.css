@@ -5,6 +5,8 @@ body{
   position: relative;
   background-color: lightskyblue;
   font-family: Arial, Helvetica, sans-serif;
+  height: 100vh;
+  overflow: hidden;
 }
 ul {
   display: grid;
