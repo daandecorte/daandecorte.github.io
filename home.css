@@ -9,7 +9,6 @@ body{
 ul {
   display: grid;
   gap: 5rem;
-  margin-top: 15%;
 }
 li {
   list-style-type: none;
