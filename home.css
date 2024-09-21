@@ -3,7 +3,7 @@ body{
   justify-content: center;
   align-items: center;
   position: relative;
-  background-color: lightskyblue;
+  background-color: white;
   font-family: Arial, Helvetica, sans-serif;
   height: 100vh;
   overflow: hidden;
@@ -18,7 +18,7 @@ li {
   justify-content: center;
 }
 a {
-  font-size: 4.5rem;
+  font-size: 3.5rem;
   text-decoration: none;
   color: white;
   background-color: gray;
